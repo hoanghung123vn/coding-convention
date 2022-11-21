@@ -1,46 +1,93 @@
-# Getting Started with Create React App
+### Setup coding convention
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- Add dev dependency
 
-## Available Scripts
+```
+yarn add --dev husky @commitlint/{config-conventional,cli} lint-staged eslint prettier
+```
 
-In the project directory, you can run:
+- Setup
+  Add ESlint config `.eslintrc.js`
 
-### `yarn start`
+```js
+"rules": {
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "semi": ["error", "always"], // auto add semi colon
+    "no-unused-vars": ["error", { "vars": "all" }] // check var unused
+}
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Add config to your `settings.json` in VScode
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```json
+"editor.codeActionsOnSave": {
+  "source.fixAll.tslint": true,
+  "source.fixAll.eslint": true
+},
+```
 
-### `yarn test`
+Setup husky
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npx husky install
+npx husky add .husky/pre-commit "yarn lint-staged"
+npx husky add .husky/commit-msg ""
+```
 
-### `yarn build`
+Change `.husky/commit-msg`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+npx --no-install commitlint --edit "$1"
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Add file `.commitlintrc.js`
 
-### `yarn eject`
+```
+module.exports = {extends: ['@commitlint/config-conventional']};
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Add to your package.json
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+"scripts": {
+    ...
+    "postinstall": "husky install",
+    "lint-staged": "lint-staged",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.{tsx,ts}\" --fix",
+    "format": "prettier \"src/**/*.{tsx,ts}\" --write"
+  },
+  "lint-staged": {
+    "*.{tsx,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Code commit rules:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+#### Format: type(scope?): subject
 
-## Learn More
+#### Type:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+- ci: Changes to our CI configuration files and scripts (example scopes: Gitlab CI, Circle, BrowserStack, SauceLabs)
+- chore: add something without touching production code (Eg: update npm dependencies)
+- docs: Documentation only changes
+- feat: A new feature
+- fix: A bug fix
+- perf: A code change that improves performance
+- refactor: A code change that neither fixes a bug nor adds a feature
+- revert: Reverts a previous commit
+- style: Changes that do not affect the meaning of the code (Eg: adding white-space, formatting, missing semi-colons, etc)
+- test: Adding missing tests or correcting existing tests
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Scope: Package/app/lib name
+
+#### Subject: Commit content

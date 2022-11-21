@@ -20,7 +20,17 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "husky install",
+    "lint-staged": "lint-staged",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.{tsx,ts}\" --fix",
+    "format": "prettier \"src/**/*.{tsx,ts}\" --write"
+  },
+  "lint-staged": {
+    "*.{tsx,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -39,5 +49,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.2.0",
+    "@commitlint/config-conventional": "^17.2.0",
+    "eslint": "^8.28.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1"
   }
 }
